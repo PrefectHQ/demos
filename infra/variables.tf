@@ -7,4 +7,4 @@ variable "prefect_api_key" {
 variable "prefect_account_id" {
   description = "Prefect Cloud Account ID"
   type        = string
-} 
+}

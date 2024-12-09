@@ -35,4 +35,4 @@ resource "prefect_work_pool" "production_default" {
   name        = "default-work-pool"
   workspace_id = prefect_workspace.production.id
   type        = "docker"
-} 
+}
