@@ -8,12 +8,16 @@
 # 3. A flow in each workspace                                                 #
 # 4. The flow in each workspace is run multiple times                         #
 # 5. The flow in `staging` has failures to demonstrate debugging              #
-#                                                                             #
-# NOTE: You must have Docker running on your machine to run this script!!!    #
+#
+# NOTE: You must have Docker and Terraform installed                          #
 ###############################################################################
 
 # Exit on any error
 set -e
+
+###############################################################################
+# Check for dependencies
+###############################################################################
 
 # Check if Docker is running
 echo "🐳 Checking if Docker is running..."
@@ -24,7 +28,52 @@ fi
 
 echo "✅ Docker is running"
 
+# Check if Terraform is installed
+echo "🔧 Checking if Terraform is installed..."
+if ! command -v terraform &> /dev/null; then
+    echo "❌ Error: Terraform is not installed. Please install Terraform and try again."
+    exit 1
+fi
+
+echo "✅ Terraform is installed"
+
+# Check if Python is installed and determine the Python command
+echo "🐍 Checking if Python is installed..."
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    echo "❌ Error: Python is not installed. Please install Python 3.9 or higher and try again."
+    exit 1
+fi
+
+# Verify Python version is 3.9 or higher
+if ! $PYTHON_CMD -c "import sys; assert sys.version_info >= (3, 9), 'Python 3.9 or higher is required'" &> /dev/null; then
+    echo "❌ Error: Python 3.9 or higher is required. Found $($PYTHON_CMD --version)"
+    exit 1
+fi
+
+echo "✅ Python $(${PYTHON_CMD} --version) is installed"
+
+###############################################################################
+# Set up virtual environment
+###############################################################################
+
+# Create and activate virtual environment
+echo "🌟 Setting up Python virtual environment..."
+$PYTHON_CMD -m venv temp_venv
+source temp_venv/bin/activate
+
+# Install requirements
+echo "📦 Installing Python packages..."
+pip install -r requirements.txt
+
 echo "🔑 Reading Prefect API key and account ID..."
+
+###############################################################################
+# Get auth credentials
+###############################################################################
 
 # Get active profile from `profiles.toml`
 ACTIVE_PROFILE=$(awk -F ' = ' '/^active/ {gsub(/"/, "", $2); print $2}' ~/.prefect/profiles.toml)
@@ -45,8 +94,12 @@ export TF_VAR_prefect_api_key=$API_KEY
 ACCOUNT_ID=$(prefect config view | awk -F'/' '/^https:\/\/app.prefect.cloud\/account\// {print $5}')
 export TF_VAR_prefect_account_id=$ACCOUNT_ID
 
-# Get account handle from the active workspace
-ACCOUNT_HANDLE=$(prefect cloud workspace ls | awk '/^│ \*/ {print $3}' | cut -d'/' -f1)
+# Get account handle for the account ID given above
+ACCOUNT_HANDLE=$(curl -s "https://api.prefect.cloud/api/accounts/$ACCOUNT_ID" -H "Authorization: Bearer $API_KEY" | awk -F'"handle":"' '{print $2}' | awk -F'"' '{print $1}')
+
+###############################################################################
+# Provision Prefect Cloud resources
+###############################################################################
 
 echo "🏗️ Running Terraform to provision infrastructure..."
 cd infra/
@@ -54,6 +107,8 @@ terraform init
 terraform apply -auto-approve
 cd ..
 
+###############################################################################
+# Run flows in production
 ###############################################################################
 
 echo "🚀 Populate production workspace..."
@@ -77,6 +132,8 @@ wait $PROD_SIM_PID
 kill $PROD_WORKER_PID
 
 ###############################################################################
+# Run flows in production
+###############################################################################
 
 echo "🚀 Populate staging workspace..."
 
@@ -99,5 +156,10 @@ wait $STAGING_SIM_PID
 kill $STAGING_WORKER_PID
 
 ###############################################################################
+# Cleanup virtual environment
+###############################################################################
+
+deactivate
+rm -rf temp_venv
 
 echo "✅ All done!"
