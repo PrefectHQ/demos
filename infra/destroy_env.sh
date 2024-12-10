@@ -1,15 +1,7 @@
 #!/bin/bash
 
 ###############################################################################
-# This script sets up a Prefect Cloud account with the following environment  #
-#                                                                             #
-# 1. Two workspaces: `production` and `staging`                               #
-# 2. A default Docker work pool in each workspace                             #
-# 3. A flow in each workspace                                                 #
-# 4. The flow in each workspace is run multiple times                         #
-# 5. The flow in `staging` has failures to demonstrate debugging              #
-#                                                                             #
-# NOTE: You must have Docker running on your machine to run this script!!!    #
+# This script destroys any Prefect Cloud resources created by `setup_env.sh`  #
 ###############################################################################
 
 # Exit on any error
