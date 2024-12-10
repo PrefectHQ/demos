@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###############################################################################
-# This script sets up a Prefect Cloud account with the following environment  #
+# This script sets up a _paid_ Prefect Cloud account with resources:          #
 #                                                                             #
 # 1. Two workspaces: `production` and `staging`                               #
 # 2. A default Docker work pool in each workspace                             #
@@ -113,13 +113,13 @@ cd ..
 
 echo "🚀 Populate production workspace..."
 
-# Start worker for production workspace
+# Start worker for production workspace with suppressed output
 prefect cloud workspace set --workspace "$ACCOUNT_HANDLE/production"
-prefect worker start --pool "default-work-pool" &
+prefect worker start --pool "default-work-pool" > /dev/null 2>&1 &
 PROD_WORKER_PID=$!
 
 # Give workers time to start
-sleep 10
+sleep 5
 
 # Run in production workspace
 python simulate_failures.py &
@@ -132,18 +132,18 @@ wait $PROD_SIM_PID
 kill $PROD_WORKER_PID
 
 ###############################################################################
-# Run flows in production
+# Run flows in staging
 ###############################################################################
 
 echo "🚀 Populate staging workspace..."
 
-# Start worker for staging workspace
+# Start worker for staging workspace with suppressed output
 prefect cloud workspace set --workspace "$ACCOUNT_HANDLE/staging"
-prefect worker start --pool "default-work-pool" &
+prefect worker start --pool "default-work-pool" > /dev/null 2>&1 &
 STAGING_WORKER_PID=$!
 
 # Give workers time to start
-sleep 10
+sleep 5
 
 # Run in staging workspace
 python simulate_failures.py --fail-at-run 3 &
