@@ -28,8 +28,5 @@ export TF_VAR_prefect_api_key=$API_KEY
 ACCOUNT_ID=$(prefect config view | awk -F'/' '/^https:\/\/app.prefect.cloud\/account\// {print $5}')
 export TF_VAR_prefect_account_id=$ACCOUNT_ID
 
-# Get account handle from the active workspace
-ACCOUNT_HANDLE=$(prefect cloud workspace ls | awk '/^│ \*/ {print $3}' | cut -d'/' -f1)
-
 echo "🏗️ Running Terraform to provision infrastructure..."
 terraform destroy -auto-approve
