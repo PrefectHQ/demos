@@ -8,5 +8,3 @@ venv
 *.tfstate
 *.tfstate.*
 .terraform.lock.hcl
-.terraformrc
-terraform.rc
