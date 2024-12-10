@@ -57,21 +57,6 @@ fi
 echo "✅ Python $(${PYTHON_CMD} --version) is installed"
 
 ###############################################################################
-# Set up virtual environment
-###############################################################################
-
-# Create and activate virtual environment
-echo "🌟 Setting up Python virtual environment..."
-$PYTHON_CMD -m venv temp_venv
-source temp_venv/bin/activate
-
-# Install requirements
-echo "📦 Installing Python packages..."
-pip install -r requirements.txt
-
-echo "🔑 Reading Prefect API key and account ID..."
-
-###############################################################################
 # Get auth credentials
 ###############################################################################
 
@@ -94,8 +79,34 @@ export TF_VAR_prefect_api_key=$API_KEY
 ACCOUNT_ID=$(prefect config view | awk -F'/' '/^https:\/\/app.prefect.cloud\/account\// {print $5}')
 export TF_VAR_prefect_account_id=$ACCOUNT_ID
 
-# Get account handle for the account ID given above
-ACCOUNT_HANDLE=$(curl -s "https://api.prefect.cloud/api/accounts/$ACCOUNT_ID" -H "Authorization: Bearer $API_KEY" | awk -F'"handle":"' '{print $2}' | awk -F'"' '{print $1}')
+# Account details
+ACCOUNT_DETAILS=$(curl -s "https://api.prefect.cloud/api/accounts/$ACCOUNT_ID" -H "Authorization: Bearer $API_KEY")
+
+# Get account handle
+ACCOUNT_HANDLE=$(echo $ACCOUNT_DETAILS | awk -F'"handle":"' '{print $2}' | awk -F'"' '{print $1}')
+
+# Get plan type (fail if a personal account, since these do not support multiple workspaces)
+PLAN_TYPE=$(echo $ACCOUNT_DETAILS | awk -F'"plan_type":"' '{print $2}' | awk -F'"' '{print $1}')
+
+if [[ $PLAN_TYPE == "PERSONAL" ]]; then
+    echo "❌ Error: This script requires a paid Prefect Cloud account with support for multiple workspaces."
+    exit 1
+fi
+
+###############################################################################
+# Set up virtual environment
+###############################################################################
+
+# Create and activate virtual environment
+echo "🌟 Setting up Python virtual environment..."
+$PYTHON_CMD -m venv temp_venv
+source temp_venv/bin/activate
+
+# Install requirements
+echo "📦 Installing Python packages..."
+pip install -r requirements.txt
+
+echo "🔑 Reading Prefect API key and account ID..."
 
 ###############################################################################
 # Provision Prefect Cloud resources
