@@ -6,9 +6,7 @@ from prefect.client.orchestration import get_client
 @task
 def process_data(run: int, fail_at_run: int | None = None) -> bool:
     """Simulate data processing with failures"""
-    
-    # Simulate persistent failures
-    if fail_at_run and run > fail_at_run:
+    if fail_at_run and run >= fail_at_run:
         raise Exception(f"Run failed")
     
     return True
