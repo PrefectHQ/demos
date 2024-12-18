@@ -3,6 +3,7 @@ from prefect import flow, task
 from prefect_aws import S3Bucket
 from datetime import datetime
 from prefect.artifacts import create_markdown_artifact
+from prefect.runner.storage import GitRepository
 
 @task
 def train_model(path: Path) -> object:
@@ -47,7 +48,10 @@ def update_model(path: Path):
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/daniel-prefect/demos.git@train_model_from_s3_data",
+        source=GitRepository(
+            url="https://github.com/daniel-prefect/demos.git",
+            branch="train_model_from_s3_data"
+        ),
         entrypoint="train_model.py:update_model",
     ).deploy(
         name="webhook-test",
