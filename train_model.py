@@ -47,7 +47,7 @@ def update_model(path: Path):
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/daniel-prefect/demos.git",
+        source="https://github.com/daniel-prefect/demos.git@train_model_from_s3_data",
         entrypoint="train_model.py:update_model",
     ).deploy(
         name="webhook-test",
