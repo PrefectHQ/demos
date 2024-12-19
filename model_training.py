@@ -3,7 +3,6 @@ from prefect_aws import AwsCredentials
 from prefect.blocks.system import Secret
 import sagemaker
 from sagemaker.xgboost.estimator import XGBoost
-import pandas as pd
 import boto3
 
 @task(log_prints=True)
@@ -30,6 +29,7 @@ def get_training_inputs():
 def create_training_script():
     """Create the training script dynamically"""
     training_script = """import argparse
+import boto3
 import os
 import json
 import pandas as pd
@@ -114,13 +114,23 @@ if __name__ == "__main__":
     )
 
     # Save the model
-    model_location = os.path.join(args.model_dir, "xgboost-model")
+    filename = "xgboost-model"
+    model_location = os.path.join(args.model_dir, filename)
     model.save_model(model_location)
 
     # Save the model parameters
     hyperparameters_location = os.path.join(args.model_dir, "hyperparameters.json")
     with open(hyperparameters_location, "w") as f:
         json.dump(hyperparameters, f)
+
+    # Upload the model to an S3 bucket for inference using boto3
+    s3_client = boto3.client('s3')
+    bucket_name = "prefect-model"  # Make sure this matches your bucket
+    s3_client.upload_file(
+        model_location,
+        bucket_name,
+        filename
+    )
 """
     
     with open("train.py", "w") as f:
