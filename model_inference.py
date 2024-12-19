@@ -3,8 +3,8 @@ from prefect_aws import S3Bucket
 from prefect.runner.storage import GitRepository
 import xgboost as xgb
 import numpy as np
-
-from io import BytesIO
+import tempfile
+import os
 
 # Load the saved model:
 @task
@@ -13,19 +13,25 @@ def load_model(filename):
 
     # Get the S3 bucket block
     s3_bucket = S3Bucket.load("s3-bucket-block")
+
+    # Create a temporary file to store the model
+    with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+        temp_path = temp_file.name
+        
+        # Download the model file
+        s3_bucket.download_object_to_file(
+            from_path=filename,
+            to_path=temp_path
+        )
+        
+        # Load the XGBoost model
+        model = xgb.Booster()
+        model.load_model(temp_path)
     
-    # Download the model file to a BytesIO object
-    model_bytes = BytesIO()
-    s3_bucket.download_object_to_file_object(
-        filename,
-        model_bytes
-    )
-    
-    # Reset the buffer position to the start
-    model_bytes.seek(0)
-    loaded_model = xgb.Booster()
-    loaded_model.load_model(model_bytes)
-    return loaded_model
+    # Clean up the temporary file
+    os.unlink(temp_path)
+
+    return model
 
 # Run inference with loaded model:
 @task
