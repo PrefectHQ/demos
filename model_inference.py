@@ -24,7 +24,7 @@ def load_model(filename):
     # Reset the buffer position to the start
     model_bytes.seek(0)
     loaded_model = xgb.Booster()
-    loaded_model.load_model(filename)
+    loaded_model.load_model(model_bytes)
     return loaded_model
 
 # Run inference with loaded model:
