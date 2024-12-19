@@ -36,13 +36,13 @@ def predict(model, X):
         X: Features array/matrix in the same format used during training
     """
     # Convert input to DMatrix (optional but recommended)
-    dtest = xgb.DMatrix(X)
+    dtest = xgb.DMatrix(np.array(X))
     # Get predictions
     predictions = model.predict(dtest)
     return predictions
 
 @flow(log_prints=True)
-def run_inference(samples: np.ndarray = np.array([[5.0,3.4,1.5,0.2], [6.4,3.2,4.5,1.5], [7.2,3.6,6.1,2.5]])):
+def run_inference(samples: list = [[5.0,3.4,1.5,0.2], [6.4,3.2,4.5,1.5], [7.2,3.6,6.1,2.5]]):
     model = load_model('xgboost-model')
     predictions = predict(model, samples)
     for sample, prediction in zip(samples, predictions):
