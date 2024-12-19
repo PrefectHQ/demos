@@ -1,6 +1,7 @@
 from prefect import flow, task
 from prefect_aws import AwsCredentials
 from prefect.blocks.system import Secret
+from prefect.runner.storage import GitRepository
 import sagemaker
 from sagemaker.xgboost.estimator import XGBoost
 import boto3
@@ -188,4 +189,13 @@ def train_iris_model():
     return estimator
 
 if __name__ == "__main__":
-    train_iris_model()
+    flow.from_source(
+        source=GitRepository(
+            url="https://github.com/daniel-prefect/demos",
+            branch="train_model_from_s3_data",
+        ),
+        entrypoint="model_training.py:train_iris_model"
+    ).deploy(
+        name="model-training",
+        work_pool_name="my-managed-pool",
+    )
