@@ -19,7 +19,7 @@ def load_model(filename):
         temp_path = temp_file.name
         
         # Download the model file
-        s3_bucket.download_object_to_file(
+        s3_bucket.download_object_to_path(
             from_path=filename,
             to_path=temp_path
         )
