@@ -63,5 +63,5 @@ if __name__ == "__main__":
         entrypoint="model_inference.py:run_inference",
     ).deploy(
         name="model-inference",
-        work_pool_name="my-managed-pool",
+        work_pool_name="my-process-pool",
     )
