@@ -5,6 +5,7 @@ from prefect.runner.storage import GitRepository
 import sagemaker
 from sagemaker.xgboost.estimator import XGBoost
 import boto3
+import psutil
 
 @task(log_prints=True)
 def get_sagemaker_session(aws_credentials):
@@ -183,8 +184,9 @@ def train_iris_model():
     # Create and train estimator
     estimator = create_xgboost_estimator(sagemaker_session, role_arn)
 
-    print(estimator)
+    print(f"Memory usage pre-training: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     estimator.fit(training_inputs, wait=True)
+    print(f"Memory usage post-training: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     
     return estimator
 
