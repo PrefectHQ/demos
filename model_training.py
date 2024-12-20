@@ -169,20 +169,26 @@ def create_xgboost_estimator(sagemaker_session, role_arn):
 def train_iris_model():
     """Main flow to train XGBoost model on Iris dataset using SageMaker."""
     # Load AWS credentials from Prefect Block
+    print(f"Initial memory usage: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     aws_credentials = AwsCredentials.load("aws-credentials")
+    print(f"Memory usage after AWS credentials load: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     
     # Get SageMaker role ARN from Prefect Secret Block
     role_arn = Secret.load("sagemaker-role-arn").get()
+    print(f"Memory usage after Sagemaker role load: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     
     # Create SageMaker session
     sagemaker_session = get_sagemaker_session(aws_credentials)
-    
+    print(f"Memory usage after Sagemaker session load: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
+
     # Get training inputs
     training_inputs = get_training_inputs()
     create_training_script()
+    print(f"Memory usage after training script creation: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     
     # Create and train estimator
     estimator = create_xgboost_estimator(sagemaker_session, role_arn)
+    print(f"Memory usage after estimator creation: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
 
     print(f"Memory usage pre-training: total - {psutil.virtual_memory().total}, percent - {psutil.virtual_memory().percent}%")
     estimator.fit(training_inputs, wait=True)
