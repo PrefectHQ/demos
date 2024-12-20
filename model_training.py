@@ -190,10 +190,7 @@ def train_iris_model():
 
 if __name__ == "__main__":
     flow.from_source(
-        source=GitRepository(
-            url="https://github.com/daniel-prefect/demos",
-            branch="train_model_from_s3_data",
-        ),
+        source="https://github.com/PrefectHQ/demos",
         entrypoint="model_training.py:train_iris_model"
     ).deploy(
         name="model-training",
