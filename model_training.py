@@ -205,6 +205,5 @@ if __name__ == "__main__":
         entrypoint="model_training.py:train_iris_model"
     ).deploy(
         name="model-training",
-        work_pool_name="my-docker-pool",
-        push=False
+        work_pool_name="my-process-pool"
     )
