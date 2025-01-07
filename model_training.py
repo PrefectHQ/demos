@@ -18,7 +18,7 @@ def get_sagemaker_session(aws_credentials):
 @task
 def get_training_inputs():
     """Get the S3 paths for training and test data."""
-    bucket = "prefect-tutorial"
+    bucket = "prefect-ml-data"
     
     return {
         "train": f"s3://{bucket}/train.csv",
