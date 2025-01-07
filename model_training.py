@@ -188,7 +188,7 @@ def train_model():
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/PrefectHQ/demos",
+        source="https://github.com/daniel-prefect/demos.git",
         entrypoint="model_training.py:train_model"
     ).deploy(
         name="model-training",

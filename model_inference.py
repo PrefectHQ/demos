@@ -55,7 +55,7 @@ def run_inference(samples: list = [[5.0,3.4,1.5,0.2], [6.4,3.2,4.5,1.5], [7.2,3.
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/PrefectHQ/demos",
+        source="https://github.com/daniel-prefect/demos.git",
         entrypoint="model_inference.py:run_inference",
     ).deploy(
         name="model-inference",
