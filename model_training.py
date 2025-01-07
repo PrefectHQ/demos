@@ -88,7 +88,7 @@ if __name__ == "__main__":
     dtrain = xgb.DMatrix(X_train, label=y_train)
     dvalidation = xgb.DMatrix(X_validation, label=y_validation)
 
-    hyperparameters = {
+    hyperparameters = {{
         "max_depth": args.max_depth,
         "eta": args.eta,
         "gamma": args.gamma,
@@ -100,7 +100,7 @@ if __name__ == "__main__":
         "predictor": args.predictor,
         "device": args.device,
         "num_class": args.num_class
-    }
+    }}
 
     # Train the model
     watchlist = [(dtrain, "train"), (dvalidation, "validation")]
