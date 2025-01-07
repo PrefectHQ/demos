@@ -1,11 +1,9 @@
 from prefect import flow, task
 from prefect_aws import AwsCredentials
 from prefect.blocks.system import Secret
-from prefect.runner.storage import GitRepository
 import sagemaker
 from sagemaker.xgboost.estimator import XGBoost
 import boto3
-import psutil
 
 @task(log_prints=True)
 def get_sagemaker_session(aws_credentials):

@@ -1,6 +1,5 @@
 from prefect import flow, task
 from prefect_aws import S3Bucket
-from prefect.runner.storage import GitRepository
 import xgboost as xgb
 import numpy as np
 import tempfile
