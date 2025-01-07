@@ -187,7 +187,7 @@ def train_model(data_bucket: str = "prefect-ml-data", model_bucket: str = "prefe
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/daniel-prefect/demos.git",
+        source="https://github.com/PrefectHQ/demos.git",
         entrypoint="model_training.py:train_model"
     ).deploy(
         name="model-training",
