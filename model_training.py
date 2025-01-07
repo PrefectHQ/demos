@@ -26,8 +26,8 @@ def get_training_inputs(data_bucket):
 
 @task
 def create_training_script(model_bucket):
-    f"""Create the training script dynamically"""
-    training_script = """import argparse
+    """Create the training script dynamically"""
+    training_script = f"""import argparse
 import boto3
 import os
 import json
