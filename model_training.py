@@ -164,7 +164,7 @@ def create_xgboost_estimator(sagemaker_session, role_arn):
     )
 
 @flow(log_prints=True)
-def train_iris_model():
+def train_model():
     """Main flow to train XGBoost model on Iris dataset using SageMaker."""
     # Load AWS credentials from Prefect Block
     aws_credentials = AwsCredentials.load("aws-credentials")
@@ -189,7 +189,7 @@ def train_iris_model():
 if __name__ == "__main__":
     flow.from_source(
         source="https://github.com/PrefectHQ/demos",
-        entrypoint="model_training.py:train_iris_model"
+        entrypoint="model_training.py:train_model"
     ).deploy(
         name="model-training",
         work_pool_name="my-process-pool"
