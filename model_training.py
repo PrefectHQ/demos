@@ -16,18 +16,17 @@ def get_sagemaker_session(aws_credentials):
     return sagemaker.Session(boto_session=boto_session)
 
 @task
-def get_training_inputs():
+def get_training_inputs(data_bucket):
     """Get the S3 paths for training and test data."""
-    bucket = "prefect-ml-data"
     
     return {
-        "train": f"s3://{bucket}/train.csv",
-        "validation": f"s3://{bucket}/test.csv"
+        "train": f"s3://{data_bucket}/train.csv",
+        "validation": f"s3://{data_bucket}/test.csv"
     }
 
 @task
-def create_training_script():
-    """Create the training script dynamically"""
+def create_training_script(model_bucket):
+    f"""Create the training script dynamically"""
     training_script = """import argparse
 import boto3
 import os
@@ -125,7 +124,7 @@ if __name__ == "__main__":
 
     # Upload the model to an S3 bucket for inference using boto3
     s3_client = boto3.client('s3')
-    bucket_name = "prefect-model"  # Make sure this matches your bucket
+    bucket_name = "{model_bucket}"
     s3_client.upload_file(
         model_location,
         bucket_name,
@@ -164,7 +163,7 @@ def create_xgboost_estimator(sagemaker_session, role_arn):
     )
 
 @flow(log_prints=True)
-def train_model():
+def train_model(data_bucket: str = "prefect-ml-data", model_bucket: str = "prefect-model"):
     """Main flow to train XGBoost model on Iris dataset using SageMaker."""
     # Load AWS credentials from Prefect Block
     aws_credentials = AwsCredentials.load("aws-credentials")
@@ -176,8 +175,8 @@ def train_model():
     sagemaker_session = get_sagemaker_session(aws_credentials)
 
     # Get training inputs
-    training_inputs = get_training_inputs()
-    create_training_script()
+    training_inputs = get_training_inputs(data_bucket)
+    create_training_script(model_bucket)
     
     # Create and train estimator
     estimator = create_xgboost_estimator(sagemaker_session, role_arn)
