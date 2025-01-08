@@ -1,5 +1,6 @@
 from prefect import flow, task
 from prefect_aws import AwsCredentials
+from prefect.cache_policies import NONE
 from prefect.blocks.system import Secret
 import sagemaker
 from sagemaker.xgboost.estimator import XGBoost
@@ -38,7 +39,7 @@ def create_training_script(model_bucket):
     with open("train.py", "w") as f:
         f.write(training_script)
 
-@task(cache_policy=None)
+@task(cache_policy=NONE)
 def create_xgboost_estimator(sagemaker_session, role_arn):
     """Create and configure the XGBoost estimator."""
     hyperparameters = {
