@@ -51,8 +51,7 @@ def create_xgboost_estimator(sagemaker_session, role_arn):
         "objective": "multi:softmax",
         "num_class": 3,
         "num_round": 100,
-        "tree_method": "gpu_hist",
-        "device": "cuda"
+        "tree_method": "gpu_hist"
     }
 
     return XGBoost(

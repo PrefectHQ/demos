@@ -24,7 +24,6 @@ if __name__ == "__main__":
     parser.add_argument("--num_round", type=int)
     parser.add_argument("--tree_method", type=str, default="auto")
     parser.add_argument("--predictor", type=str, default="auto")
-    parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--num_class", type=int)
 
     # Sagemaker specific arguments. Defaults are set in the environment variables.
@@ -69,7 +68,6 @@ if __name__ == "__main__":
         "objective": args.objective,
         "tree_method": args.tree_method,
         "predictor": args.predictor,
-        "device": args.device,
         "num_class": args.num_class
     }}
 
