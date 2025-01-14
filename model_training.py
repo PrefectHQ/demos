@@ -102,5 +102,5 @@ if __name__ == "__main__":
         entrypoint="model_training.py:train_model"
     ).deploy(
         name="model-training",
-        work_pool_name="my-process-pool"
+        work_pool_name="my-work-pool"
     )
