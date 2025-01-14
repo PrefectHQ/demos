@@ -11,6 +11,6 @@ if __name__ == "__main__":
         ]},
     ).deploy(
         name="my-first-deployment",
-        work_pool_name="my-managed-pool",
+        work_pool_name="my-work-pool",
         cron="0 1 * * *",
     )
