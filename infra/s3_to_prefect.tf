@@ -92,6 +92,56 @@ module "s3_model_bucket_to_prefect" {
   }
 }
 
+# Automation for model training
+resource "prefect_automation" "train_model" {
+  name        = "train-model"
+  enabled     = true
+
+  trigger = {
+    event = {
+      posture = "Reactive"
+      match_related = jsonencode({
+        "prefect.resource.id" : ["prefect-cloud.webhook.${ module.s3_data_bucket_to_prefect.webhook.id }"]
+      })
+      expect    = ["webhook.called"]
+      threshold = 1
+      within    = 60
+    }
+  }
+  actions = [
+    {
+      type   = "run-deployment"
+      source = "selected"
+      deployment_id = var.model_training_deployment_id
+    }
+  ]
+}
+
+# Automation for model inference
+resource "prefect_automation" "run_inference" {
+  name        = "run-inference"
+  enabled     = true
+
+  trigger = {
+    event = {
+      posture = "Reactive"
+      match_related = jsonencode({
+        "prefect.resource.id" : ["prefect-cloud.webhook.${ module.s3_model_bucket_to_prefect.webhook.id }"]
+      })
+      expect    = ["webhook.called"]
+      threshold = 1
+      within    = 60
+    }
+  }
+  actions = [
+    {
+      type   = "run-deployment"
+      source = "selected"
+      deployment_id = var.model_inference_deployment_id
+    }
+  ]
+}
+
 # Variables
 variable "prefect_workspace_id" {
   type        = string
@@ -106,4 +156,14 @@ variable "data_bucket_name" {
 variable "model_bucket_name" {
   type        = string
   description = "Name of the S3 bucket for models"
+}
+
+variable "model_training_deployment_id" {
+  type        = string
+  description = "ID of the deployment for model training"
+}
+
+variable "model_inference_deployment_id" {
+  type        = string
+  description = "ID of the deployment for model inference"
 }
