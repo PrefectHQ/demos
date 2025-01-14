@@ -1,8 +1,11 @@
 from prefect import flow
 
+# Source for the code to deploy (here, a GitHub repo)
+SOURCE_REPO="https://github.com/prefecthq/demos.git"
+
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/prefecthq/demos.git",
+        source=SOURCE_REPO,
         entrypoint="my_workflow.py:show_stars",
     ).deploy(
         name="my-first-deployment",
