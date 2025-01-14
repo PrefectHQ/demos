@@ -75,7 +75,7 @@ def train_model(data_bucket: str | None = None, model_bucket: str | None = None)
     """Main flow to train XGBoost model on Iris dataset using SageMaker."""
     data_bucket = data_bucket or "prefect-ml-data"
     model_bucket = model_bucket or "prefect-model"
-    
+
     # Load AWS credentials from Prefect Block
     aws_credentials = AwsCredentials.load("aws-credentials")
     
