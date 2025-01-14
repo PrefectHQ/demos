@@ -2,7 +2,7 @@ from prefect import flow
 
 if __name__ == "__main__":
     flow.from_source(
-        source="https://github.com/prefecthq/demos.git",
+        source="https://github.com/daniel-prefect/demos.git",
         entrypoint="my_workflow.py:show_stars",
     ).deploy(
         name="my-first-deployment",
@@ -12,5 +12,5 @@ if __name__ == "__main__":
             "huggingface/transformers"
         ]},
         work_pool_name="my-work-pool",
-        cron="0 1 * * *",
+        cron="0 * * * *",  # Run every hour
     )
