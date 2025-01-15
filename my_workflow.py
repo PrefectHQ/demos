@@ -1,22 +1,41 @@
 import httpx
-from prefect import flow
+
+from prefect import flow, task # Prefect flow and task decorators
 
 
 @flow(log_prints=True)
-def get_repo_info():
-    url = "https://api.github.com/repos/PrefectHQ/prefect"
-    response = httpx.get(url)
-    repo = response.json()
-    print("PrefectHQ/prefect repository statistics 🤓:")
-    print(f"Stars 🌠 : {repo['stargazers_count']}")
+def show_stars(github_repos: list[str]):
+    """Flow: Show the number of stars that GitHub repos have"""
+
+    for repo in github_repos:
+        # Call Task 1
+        repo_stats = fetch_stats(repo)
+
+        # Call Task 2
+        stars = get_stars(repo_stats)
+
+        # Print the result
+        print(f"{repo}: {stars} stars")
 
 
+@task
+def fetch_stats(github_repo: str):
+    """Task 1: Fetch the statistics for a GitHub repo"""
+
+    return httpx.get(f"https://api.github.com/repos/{github_repo}").json()
+
+
+@task
+def get_stars(repo_stats: dict):
+    """Task 2: Get the number of stars from GitHub repo statistics"""
+
+    return repo_stats['stargazers_count']
+
+
+# Run the flow
 if __name__ == "__main__":
-    flow.from_source(
-        source="https://github.com/prefecthq/demos.git",
-        entrypoint="my_workflow.py:get_repo_info",
-    ).deploy(
-        name="my-first-deployment",
-        work_pool_name="my-managed-pool",
-        cron="0 1 * * *",
-    )
+    show_stars([
+        "PrefectHQ/prefect",
+        "pydantic/pydantic",
+        "huggingface/transformers"
+    ])
