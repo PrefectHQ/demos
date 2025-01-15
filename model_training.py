@@ -6,7 +6,7 @@ import sagemaker
 from sagemaker.xgboost.estimator import XGBoost
 import boto3
 from sagemaker.session import Session
-from typing import TypedDict
+from typing import TypedDict, Union
 
 class TrainingInputs(TypedDict):
     train: str
@@ -71,7 +71,7 @@ def create_xgboost_estimator(sagemaker_session: Session, role_arn: str) -> XGBoo
     )
 
 @flow(log_prints=True)
-def train_model(data_bucket: str | None = None, model_bucket: str | None = None) -> XGBoost:
+def train_model(data_bucket: Union[str, None] = None, model_bucket: Union[str, None] = None) -> XGBoost:
     """Main flow to train XGBoost model on Iris dataset using SageMaker."""
     data_bucket = data_bucket or "prefect-ml-data"
     model_bucket = model_bucket or "prefect-model"

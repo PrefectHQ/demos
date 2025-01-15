@@ -4,6 +4,7 @@ import xgboost as xgb
 import numpy as np
 import tempfile
 import os
+from typing import Union
 
 # Load the saved model:
 @task
@@ -34,7 +35,7 @@ def load_model(filename: str) -> xgb.Booster:
 
 # Run inference with loaded model:
 @task
-def predict(model: xgb.Booster, X: list[list[float]] | np.ndarray) -> np.ndarray:
+def predict(model: xgb.Booster, X: Union[list[list[float]], np.ndarray]) -> np.ndarray:
     """Make predictions using the loaded model
     Args:
         model: Loaded XGBoost model
@@ -47,7 +48,7 @@ def predict(model: xgb.Booster, X: list[list[float]] | np.ndarray) -> np.ndarray
     return predictions
 
 @flow(log_prints=True)
-def run_inference(samples: list[list[float]] | None = None) -> None:
+def run_inference(samples: Union[list[list[float]], None] = None) -> None:
     samples = samples or [[5.0,3.4,1.5,0.2], [6.4,3.2,4.5,1.5], [7.2,3.6,6.1,2.5]]
     model = load_model('xgboost-model')
     predictions = predict(model, samples)
