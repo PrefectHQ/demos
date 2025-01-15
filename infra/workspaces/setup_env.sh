@@ -104,7 +104,7 @@ source temp_venv/bin/activate
 
 # Install requirements
 echo "📦 Installing Python packages..."
-pip install -r requirements.txt
+pip install -r ../../requirements.txt
 
 echo "🔑 Reading Prefect API key and account ID..."
 
@@ -113,10 +113,8 @@ echo "🔑 Reading Prefect API key and account ID..."
 ###############################################################################
 
 echo "🏗️ Running Terraform to provision infrastructure..."
-cd infra/
 terraform init
 terraform apply -auto-approve
-cd ..
 
 ###############################################################################
 # Run flows in production
@@ -133,7 +131,7 @@ PROD_WORKER_PID=$!
 sleep 5
 
 # Run in production workspace
-python simulate_failures.py &
+python ../../simulate_failures.py &
 PROD_SIM_PID=$!
 
 # Wait for simulations to complete
@@ -157,7 +155,7 @@ STAGING_WORKER_PID=$!
 sleep 5
 
 # Run in staging workspace
-python simulate_failures.py --fail-at-run 3 &
+python ../../simulate_failures.py --fail-at-run 3 &
 STAGING_SIM_PID=$!
 
 # Wait for simulations to complete
