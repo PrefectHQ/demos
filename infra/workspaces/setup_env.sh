@@ -56,6 +56,15 @@ fi
 
 echo "✅ Python $(${PYTHON_CMD} --version) is installed"
 
+# Check if jq is installed
+echo "🔧 Checking if jq is installed..."
+if ! command -v jq &> /dev/null; then
+    echo "❌ Error: jq is not installed. Please install jq and try again."
+    exit 1
+fi
+
+echo "✅ jq is installed"
+
 ###############################################################################
 # Establish account and workspace details
 ###############################################################################
