@@ -50,7 +50,7 @@ if __name__ == "__main__":
     # Deploy the flow
     deployment_id = data_pipeline.deploy(
         name=args.name,
-        work_pool_name="default-work-pool",
+        work_pool_name="my-work-pool",
         image="prefecthq/prefect:3-latest",
         push=False,
         tags=args.tags.split(',')
