@@ -1,6 +1,6 @@
 variable "workspace_name" {
+  description = "Name of the workspace to create"
   type        = string
-  description = "Name of the Prefect workspace"
 }
 
 variable "workspace_handle" {

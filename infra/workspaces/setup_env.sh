@@ -3,12 +3,12 @@
 ###############################################################################
 # This script sets up a _paid_ Prefect Cloud account with resources:          #
 #                                                                             #
-# 1. Two workspaces: `production` and `staging`                               #
-# 2. A Docker work pool in each workspace                             #
+# 1. Two workspaces: `production` and `staging` (customizable via env vars)   #
+# 2. A Docker work pool in each workspace                                     #
 # 3. A flow in each workspace                                                 #
 # 4. The flow in each workspace is run multiple times                         #
 # 5. The flow in `staging` has failures to demonstrate debugging              #
-#
+#                                                                             #
 # NOTE: You must have Docker and Terraform installed                          #
 ###############################################################################
 
@@ -57,7 +57,7 @@ fi
 echo "✅ Python $(${PYTHON_CMD} --version) is installed"
 
 ###############################################################################
-# Get account details
+# Establish account and workspace details
 ###############################################################################
 
 echo "🔑 Fetching Prefect account details..."
@@ -72,6 +72,14 @@ if [ -z "$TF_VAR_prefect_account_id" ]; then
     echo "❌ Error: TF_VAR_prefect_account_id environment variable is not set"
     exit 1
 fi
+
+# Set default workspace names if not provided via environment variables
+PROD_WORKSPACE=${TF_VAR_prod_workspace:-"production"}
+STAGING_WORKSPACE=${TF_VAR_staging_workspace:-"staging"}
+
+# Export for Terraform to use
+export TF_VAR_prod_workspace=$PROD_WORKSPACE
+export TF_VAR_staging_workspace=$STAGING_WORKSPACE
 
 # Account details
 ACCOUNT_DETAILS=$(curl -s "https://api.prefect.cloud/api/accounts/$TF_VAR_prefect_account_id" \
@@ -111,10 +119,10 @@ terraform apply -auto-approve
 # Run flows in production
 ###############################################################################
 
-echo "🚀 Populate production workspace..."
+echo "🚀 Populate $PROD_WORKSPACE workspace..."
 
 # Start worker for production workspace with suppressed output
-prefect cloud workspace set --workspace "$ACCOUNT_HANDLE/production"
+prefect cloud workspace set --workspace "$ACCOUNT_HANDLE/$PROD_WORKSPACE"
 prefect worker start --pool "my-work-pool" > /dev/null 2>&1 &
 PROD_WORKER_PID=$!
 
@@ -135,10 +143,10 @@ kill $PROD_WORKER_PID
 # Run flows in staging
 ###############################################################################
 
-echo "🚀 Populate staging workspace..."
+echo "🚀 Populate $STAGING_WORKSPACE workspace..."
 
 # Start worker for staging workspace with suppressed output
-prefect cloud workspace set --workspace "$ACCOUNT_HANDLE/staging"
+prefect cloud workspace set --workspace "$ACCOUNT_HANDLE/$STAGING_WORKSPACE"
 prefect worker start --pool "my-work-pool" > /dev/null 2>&1 &
 STAGING_WORKER_PID=$!
 
