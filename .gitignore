@@ -1,4 +1,11 @@
-env
+# Python
 __pycache__
-terraform*
-.terraform*
+env
+venv
+temp_venv
+
+# Terraform files
+.terraform
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
