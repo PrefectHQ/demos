@@ -15,6 +15,29 @@
 # Exit on any error
 set -e
 
+cleanup() {
+
+    # Kill any remaining worker processes
+    if [ ! -z "$PROD_WORKER_PID" ]; then
+        kill $PROD_WORKER_PID 2>/dev/null || true
+    fi
+    if [ ! -z "$STAGING_WORKER_PID" ]; then
+        kill $STAGING_WORKER_PID 2>/dev/null || true
+    fi
+
+    # Deactivate and remove virtual environment
+    if [ -d "temp_venv" ]; then
+        deactivate 2>/dev/null || true
+        rm -rf temp_venv
+    fi
+
+    echo "🧹 Cleanup completed"
+
+}
+
+# Set up trap to call cleanup function on script exit (success or failure)
+trap cleanup EXIT
+
 ###############################################################################
 # Check for dependencies
 ###############################################################################
@@ -114,15 +137,15 @@ source temp_venv/bin/activate
 
 # Install requirements
 echo "📦 Installing Python packages..."
-pip install -r ../../requirements.txt
+pip install -r ./requirements.txt
 
 ###############################################################################
 # Provision Prefect Cloud resources
 ###############################################################################
 
 echo "🏗️ Running Terraform to provision infrastructure..."
-terraform init
-terraform apply -auto-approve
+terraform -chdir=infra/workspaces init
+terraform -chdir=infra/workspaces apply -auto-approve
 
 ###############################################################################
 # Run flows in production
@@ -139,7 +162,7 @@ PROD_WORKER_PID=$!
 sleep 5
 
 # Run in production workspace
-python ../../simulate_failures.py &
+python ./simulate_failures.py &
 PROD_SIM_PID=$!
 
 # Wait for simulations to complete
@@ -163,7 +186,7 @@ STAGING_WORKER_PID=$!
 sleep 5
 
 # Run in staging workspace
-python ../../simulate_failures.py --fail-at-run 3 &
+python ./simulate_failures.py --fail-at-run 3 &
 STAGING_SIM_PID=$!
 
 # Wait for simulations to complete
@@ -171,12 +194,5 @@ wait $STAGING_SIM_PID
 
 # Kill worker process
 kill $STAGING_WORKER_PID
-
-###############################################################################
-# Cleanup virtual environment
-###############################################################################
-
-deactivate
-rm -rf temp_venv
 
 echo "✅ All done!"
