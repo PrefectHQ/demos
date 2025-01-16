@@ -11,4 +11,4 @@ output "workspace_handle" {
 output "work_pool_id" {
   value       = prefect_work_pool.default.id
   description = "ID of the created work pool"
-} 
+}

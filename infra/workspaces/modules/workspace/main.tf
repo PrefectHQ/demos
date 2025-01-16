@@ -16,4 +16,4 @@ resource "prefect_work_pool" "default" {
   name         = var.work_pool_name
   workspace_id = prefect_workspace.workspace.id
   type         = var.work_pool_type
-} 
+}

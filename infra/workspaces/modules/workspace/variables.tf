@@ -18,4 +18,4 @@ variable "work_pool_type" {
   type        = string
   description = "Type of the work pool"
   default     = "docker"
-} 
+}
