@@ -168,9 +168,6 @@ PROD_SIM_PID=$!
 # Wait for simulations to complete
 wait $PROD_SIM_PID
 
-# Kill worker process
-kill $PROD_WORKER_PID
-
 ###############################################################################
 # Run flows in staging
 ###############################################################################
@@ -191,8 +188,5 @@ STAGING_SIM_PID=$!
 
 # Wait for simulations to complete
 wait $STAGING_SIM_PID
-
-# Kill worker process
-kill $STAGING_WORKER_PID
 
 echo "✅ All done!"
