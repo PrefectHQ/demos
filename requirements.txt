@@ -1,7 +1,0 @@
-prefect
-prefect-docker
-prefect_aws
-sagemaker
-pandas
-boto3
-xgboost
