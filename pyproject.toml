@@ -1,0 +1,8 @@
+[project]
+name = "demos"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "prefect>=3.4.10",
+]
