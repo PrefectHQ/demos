@@ -5,6 +5,7 @@ pull:
 definitions:
   tags: &tags
     - crypto_prices
+    - parameters
   work_pools:
     work_pool: &work_pool
       name: local
