@@ -1,0 +1,18 @@
+pull:
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/PrefectHQ/interactive_workflow_examples.git
+
+definitions:
+  tags: &tags
+    - interactive
+  work_pools:
+    work_pool: &work_pool
+      name: local
+
+deployments:
+  - name: human-in-the-loop
+    entrypoint: human_in_the_loop.py:classify_image
+    work_pool: *work_pool
+    tags: *tags
+    schedule: null
+    description: "Fetches and stores cryptocurrency prices every hour."
