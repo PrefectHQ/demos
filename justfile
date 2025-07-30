@@ -13,7 +13,7 @@ deploy:
       fi
 
       echo "Deploying '$(pwd)' with prefect.yaml"
-      uv run "{{justfile_directory()}}/scripts/shim.py" prefect deploy --all
+      uv run "{{justfile_directory()}}/scripts/shim.py" prefect --no-prompt deploy --all
 
       popd > /dev/null
     done
