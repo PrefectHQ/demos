@@ -1,0 +1,20 @@
+pull:
+  - prefect.deployments.steps.git_clone:
+      repository: https://github.com/PrefectHQ/examples.git
+  - prefect.deployments.steps.run_shell_script:
+      script: ln -s examples/resources/prefect_dbt_project examples/02_flows/prefect_dbt_project
+
+definitions:
+  tags: &tags
+    - interactive
+  work_pools:
+    work_pool: &work_pool
+      name: local
+
+deployments:
+  - name: dbt
+    entrypoint: examples/02_flows/run_dbt_with_prefect.py:dbt_flow
+    work_pool: *work_pool
+    tags: *tags
+    schedule: null
+    description: null

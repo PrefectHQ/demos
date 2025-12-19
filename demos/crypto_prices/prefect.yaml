@@ -8,7 +8,7 @@ definitions:
     - parameters
   work_pools:
     work_pool: &work_pool
-      name: local
+      name: ecs-push
 
 deployments:
   - name: bitcoin-price-hourly

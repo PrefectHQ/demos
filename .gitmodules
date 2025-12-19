@@ -1,0 +1,9 @@
+[submodule "sources/examples"]
+	path = sources/examples
+	url = https://github.com/prefecthq/examples.git
+[submodule "sources/prefect-recipes"]
+	path = sources/prefect-recipes
+	url = https://github.com/prefecthq/prefect-recipes.git
+[submodule "sources/interactive_workflow_examples"]
+	path = sources/interactive_workflow_examples
+	url = https://github.com/PrefectHQ/interactive_workflow_examples.git
