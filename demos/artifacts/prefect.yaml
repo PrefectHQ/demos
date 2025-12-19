@@ -1,0 +1,22 @@
+pull:
+  - prefect.deployments.steps.git_clone:
+      id: git_clone
+      repository: https://github.com/PrefectHQ/demos.git
+      directories: ['demos/artifacts']
+      # TODO: Remove next line
+      branch: bd/demo-updates-jul-2025
+  - prefect.deployments.steps.set_working_directory:
+      directory: "{{ git_clone.directory }}/demos/artifacts"
+
+definitions:
+  work_pools:
+    work_pool: &work_pool
+      name: local
+
+deployments:
+  - name: check-weather-hourly
+    entrypoint: weather.py:get_weather_for_address
+    work_pool: *work_pool
+    schedule:
+      cron: "0 * * * *"
+      timezone: UTC
