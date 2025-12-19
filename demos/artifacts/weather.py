@@ -1,5 +1,3 @@
-import datetime
-
 import httpx
 from typing import Optional
 from prefect import flow, task
@@ -99,19 +97,10 @@ def create_weather_report_artifact(result: dict) -> None:
         description=f"Weather observations for {result['address']}"
     )
 
-def weather_observations_task_run_namer(parameters):    
-    name = f"Weather observations for {parameters["latitude"]}, {parameters["longitude"]}"
-    
-    if parameters.get("when"):
-        name += f" at {parameters['when'].strftime("%Y-%m-%dT%H:%M:%SZ")}"
-        
-    return name
-
-@task(log_prints=True, task_run_name=weather_observations_task_run_namer)
+@task(log_prints=True, task_run_name="Get Weather Observations at {latitude}, {longitude}")
 def get_weather_observations(
     latitude: float, 
-    longitude: float,
-    when: datetime.datetime | None = None
+    longitude: float
 ) -> dict:
     """Fetch current weather observations from the Weather.gov API using latitude and longitude."""
     # Step 1: Get grid point information
@@ -137,40 +126,18 @@ def get_weather_observations(
     print(f"Using observation station: {station_id}")
     
     # Step 3: Get latest observations from the station
-    params = {}
-    if when is None:
-        observations_url = f"https://api.weather.gov/stations/{station_id}/observations/latest"
-    else:
-        observations_url = f"https://api.weather.gov/stations/{station_id}/observations"
-        params = {
-            "start": when.astimezone(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-        }
-    observations_data = http_get(observations_url, params=params, headers={"User-Agent": "Prefect Weather Flow"}, follow_redirects=True)
-    
-    # Handle different response structures:
-    # - /latest returns a single observation object with "properties"
-    # - /observations returns a feature collection with "features" array
-    if when is None:
-        # Latest endpoint returns a single observation
-        properties = observations_data.get("properties", {})
-    else:
-        # Observations endpoint returns a feature collection
-        features = observations_data.get("features", [])
-        if not features:
-            raise ValueError(f"No observations found for station {station_id} at the specified time: {when}")
-        # Extract the first (most recent) observation from the features array
-        properties = features[0].get("properties", {})
+    observations_url = f"https://api.weather.gov/stations/{station_id}/observations/latest"
+    observations_data = http_get(observations_url, headers={"User-Agent": "Prefect Weather Flow"}, follow_redirects=True)
     
     return {
-        "properties": properties,
+        "properties": observations_data.get("properties", {}),
         "station_id": station_id
     }
 
 
-@flow(log_prints=True, flow_run_name='Get weather for {address}')
+@flow(log_prints=True, flow_run_name='Current weather for {address}')
 def get_weather_for_address(
     address: str = "2112 Pennsylvania Ave NW, Washington, DC 20037",
-    when: datetime.datetime | None = None,
 ) -> dict:
     """Prefect flow to get current weather observations for a given US street address."""
     print(f"Fetching weather for address: {address}")
@@ -181,8 +148,7 @@ def get_weather_for_address(
     # Fetch weather observations using the coordinates
     observations_result = get_weather_observations(
         coordinates["latitude"],
-        coordinates["longitude"],
-        when
+        coordinates["longitude"]
     )
     
     weather_data = observations_result["properties"]
