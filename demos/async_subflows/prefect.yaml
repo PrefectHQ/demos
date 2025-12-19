@@ -1,6 +1,9 @@
 pull:
   - prefect.deployments.steps.git_clone:
+      id: git_clone
       repository: https://github.com/PrefectHQ/prefect-recipes.git
+  - prefect.deployments.steps.set_working_directory:
+      directory: "{{ steps.git_clone.directory }}/flows-advanced/parent-orchestrator"
 
 definitions:
   tags: &tags
@@ -12,14 +15,14 @@ definitions:
 
 deployments:
   - name: Pokemon Weight Calculation
-    entrypoint: flows-advanced/parent-orchestrator/pokemon_weight.py:get_total_pokemon_weight
+    entrypoint: pokemon_weight.py:get_total_pokemon_weight
     work_pool: *work_pool
     tags: *tags
     schedule: null
     description: "Gets the total weight of all Pokemon."
 
   - name: worker
-    entrypoint: flows-advanced/parent-orchestrator/pokemon_weight.py:process_pokemon_batch
+    entrypoint: pokemon_weight.py:process_pokemon_batch
     work_pool: *work_pool
     tags: *tags
     schedule: null
